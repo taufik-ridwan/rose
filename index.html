@@ -14,52 +14,26 @@
 <body class="p-6">
 
     <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
-        <h1 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">Generator Laporan ROSE</h1>
+        
+        <!-- Header & Import Section -->
+        <div class="flex justify-between items-center mb-6 border-b pb-2">
+            <h1 class="text-2xl font-bold text-gray-800">Generator Laporan ROSE</h1>
+            <div>
+                <input type="file" id="fileInput" accept=".jadwal,.json" class="hidden" onchange="handleFileImport(this)">
+                <button onclick="document.getElementById('fileInput').click()" class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-md text-sm font-medium transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                    Import .jadwal
+                </button>
+            </div>
+        </div>
 
         <!-- General Settings -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 bg-blue-50 p-4 rounded-md">
-            <!-- Row 1: Date & Activity -->
+        <div class="mb-6 bg-blue-50 p-4 rounded-md">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Tindakan</label>
                 <input type="date" id="inputDate" class="w-full border-gray-300 border rounded-md p-2 focus:ring-blue-500 focus:border-blue-500">
-            </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Jenis Tindakan</label>
-                <select id="activitySelect" onchange="toggleOtherActivity()" class="w-full border-gray-300 border rounded-md p-2 bg-white">
-                    <option value="ROSE pendampingan MSCT Scan">ROSE pendampingan MSCT Scan</option>
-                    <option value="ROSE pendampingan bronkoskopi">ROSE pendampingan bronkoskopi</option>
-                    <option value="ROSE pendampingan biopsi bedah anak">ROSE pendampingan biopsi bedah anak</option>
-                    <option value="ROSE pendampingan biopsi ginjal">ROSE pendampingan biopsi ginjal</option>
-                    <option value="Lainnya">Lainnya</option>
-                </select>
-                <!-- Hidden input for 'Lainnya' -->
-                <input type="text" id="activityOther" class="hidden w-full border-gray-300 border rounded-md p-2 mt-2" placeholder="Tulis jenis tindakan...">
-            </div>
-
-            <!-- Row 2: Location -->
-            <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Lokasi</label>
-                <select id="location" class="w-full border-gray-300 border rounded-md p-2 bg-white">
-                    <option value="">-- Pilih Lokasi (Opsional) --</option>
-                    <option value="GBST">GBST</option>
-                    <option value="OK GBST 4.03">OK GBST 4.03</option>
-                    <option value="OK GBST 4.05">OK GBST 4.05</option>
-                    <option value="radiologi">radiologi</option>
-                    <option value="PJT Lt.4">PJT Lt.4</option>
-                    <option value="PICU">PICU</option>
-                    <option value="Cendrawasih">Cendrawasih</option>
-                </select>
-            </div>
-
-            <!-- Row 3: Senior & Junior (Moved Here) -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Senior</label>
-                <input type="text" id="globalSenior" class="w-full border-gray-300 border rounded-md p-2" placeholder="Inisial Senior">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Asisten (Junior)</label>
-                <input type="text" id="globalJunior" class="w-full border-gray-300 border rounded-md p-2" placeholder="Inisial Junior">
             </div>
         </div>
 
@@ -84,7 +58,6 @@
             <label class="block text-sm font-medium text-gray-700 mb-1">Hasil Output</label>
             <textarea id="outputResult" rows="12" class="w-full bg-gray-50 border border-gray-300 rounded-md p-4 font-mono text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500" readonly></textarea>
             
-            <!-- Button at Bottom -->
             <button id="copyButton" onclick="copyToClipboard()" class="mt-3 w-full flex items-center justify-center gap-2 bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-3 rounded-md font-bold transition duration-200">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
@@ -103,7 +76,7 @@
             <h3 class="font-bold text-gray-400 mb-2 patient-number">Pasien #1</h3>
             
             <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
-                <!-- Row 1 -->
+                <!-- Row 1: Name, Age, RM -->
                 <div class="md:col-span-6">
                     <input type="text" class="p-name w-full border rounded p-1.5 text-sm" placeholder="Nama Pasien (misal: Tn. Budi)">
                 </div>
@@ -114,22 +87,54 @@
                     <input type="text" class="p-rm w-full border rounded p-1.5 text-sm" placeholder="No. RM (Contoh: 02277844)">
                 </div>
 
-                <!-- Row 2 -->
+                <!-- Row 2: Jenis Tindakan -->
+                <div class="md:col-span-12">
+                    <select onchange="toggleOtherActivity(this)" class="p-activity w-full border-gray-300 border rounded-md p-1.5 text-sm bg-gray-50">
+                        <option value="ROSE pendampingan MSCT Scan">ROSE pendampingan MSCT Scan</option>
+                        <option value="ROSE pendampingan bronkoskopi">ROSE pendampingan bronkoskopi</option>
+                        <option value="ROSE pendampingan biopsi bedah anak">ROSE pendampingan biopsi bedah anak</option>
+                        <option value="ROSE pendampingan biopsi ginjal">ROSE pendampingan biopsi ginjal</option>
+                        <!-- ADDED: Biopsi THT -->
+                        <option value="ROSE pendampingan biopsi THT">ROSE pendampingan biopsi THT</option>
+                        <option value="Lainnya">Lainnya</option>
+                    </select>
+                    <input type="text" class="p-activity-other hidden w-full border-gray-300 border rounded-md p-1.5 mt-2 text-sm" placeholder="Tulis jenis tindakan...">
+                </div>
+
+                <!-- Row 3: Diagnosis -->
                 <div class="md:col-span-12">
                     <input type="text" class="p-dx w-full border rounded p-1.5 text-sm" placeholder="Diagnosis (Contoh: NSCLC adenokarsinoma...)">
                 </div>
 
-                <!-- Row 3 -->
+                <!-- Row 4: Lokasi & Jam -->
                 <div class="md:col-span-6">
-                    <label class="text-xs text-gray-500">Klinisi <span class="text-gray-400 italic">(Opsional)</span></label>
-                    <input type="text" class="p-clinician w-full border rounded p-1.5 text-sm" placeholder="Dr. Klinisi">
+                    <label class="text-xs text-gray-500">Lokasi</label>
+                    <select class="p-location w-full border rounded p-1.5 text-sm bg-white">
+                        <option value="">-- Pilih Lokasi (Opsional) --</option>
+                        <option value="GBST">GBST</option>
+                        <option value="OK GBST 4.03">OK GBST 4.03</option>
+                        <option value="OK GBST 4.05">OK GBST 4.05</option>
+                        <!-- UPDATED: Display: Radiologi, Value: radiologi -->
+                        <option value="radiologi">Radiologi</option>
+                        <option value="PJT Lt.4">PJT Lt.4</option>
+                        <option value="PICU">PICU</option>
+                        <option value="Cendrawasih">Cendrawasih</option>
+                        <!-- ADDED: Poli THT -->
+                        <option value="Poli THT">Poli THT</option>
+                    </select>
                 </div>
                 <div class="md:col-span-6">
                     <label class="text-xs text-gray-500">Jam Tindakan</label>
                     <input type="time" class="p-time w-full border rounded p-1.5 text-sm">
                 </div>
 
-                <!-- Row 4 -->
+                <!-- Row 5: Klinisi -->
+                <div class="md:col-span-12">
+                    <label class="text-xs text-gray-500">Klinisi <span class="text-gray-400 italic">(Opsional)</span></label>
+                    <input type="text" class="p-clinician w-full border rounded p-1.5 text-sm" placeholder="Dr. Klinisi">
+                </div>
+
+                <!-- Row 6: Dokter Konsulen -->
                 <div class="md:col-span-12">
                     <label class="text-xs text-gray-500 font-semibold text-blue-700">Dokter Konsulen</label>
                     <select class="p-acc w-full border rounded p-1.5 text-sm bg-white mb-2">
@@ -148,7 +153,6 @@
                         <option value="Dr. dr. Rita Cempaka, Sp.PA (K)">Dr. dr. Rita Cempaka, Sp.PA (K)</option>
                     </select>
 
-                    <!-- Radio Buttons & Checkbox -->
                     <div class="flex items-center gap-4 bg-gray-50 p-2 rounded border border-gray-200">
                         <label class="inline-flex items-center cursor-pointer">
                             <input type="radio" value="waiting" class="p-acc-status form-radio text-yellow-600 h-4 w-4">
@@ -158,35 +162,143 @@
                             <input type="radio" value="acc" class="p-acc-status form-radio text-green-600 h-4 w-4" checked>
                             <span class="ml-2 text-xs font-medium text-gray-700">ACC</span>
                         </label>
-                        
-                        <!-- Separator -->
                         <div class="h-4 w-px bg-gray-300"></div>
-
                         <label class="inline-flex items-center cursor-pointer">
                             <input type="checkbox" class="p-by-name form-checkbox text-blue-600 h-4 w-4" checked>
                             <span class="ml-2 text-xs font-medium text-gray-700">By name</span>
                         </label>
                     </div>
                 </div>
+
+                <!-- Row 7: Senior / Junior -->
+                <div class="md:col-span-3">
+                    <label class="text-xs text-gray-500">Senior</label>
+                    <input type="text" class="p-senior w-full border rounded p-1.5 text-sm" placeholder="Inisial">
+                </div>
+                <div class="md:col-span-3">
+                    <label class="text-xs text-gray-500">Asisten (Junior)</label>
+                    <input type="text" class="p-junior w-full border rounded p-1.5 text-sm" placeholder="Inisial">
+                </div>
             </div>
         </div>
     </template>
 
     <script>
-        // Set default date to today
         document.getElementById('inputDate').valueAsDate = new Date();
 
-        // Initial patient
         window.onload = function() {
             addPatient();
         };
 
-        // Toggle function for manual activity input
-        function toggleOtherActivity() {
-            const select = document.getElementById('activitySelect');
-            const otherInput = document.getElementById('activityOther');
+        // --- IMPORT FUNCTIONALITY ---
+        function handleFileImport(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    processImportData(data);
+                } catch (error) {
+                    alert("Format file tidak valid.");
+                    console.error(error);
+                }
+                input.value = '';
+            };
+            reader.readAsText(file);
+        }
+
+        function processImportData(data) {
+            // Filter only 'ROSE'
+            const rosePatients = data.filter(item => item.tindakan && item.tindakan.toUpperCase() === 'ROSE');
+
+            if (rosePatients.length === 0) {
+                alert("Tidak ada data dengan tindakan 'ROSE' ditemukan.");
+                return;
+            }
+
+            document.getElementById('patientList').innerHTML = '';
+
+            // Set Date from first entry
+            const firstEntry = rosePatients[0];
+            if (firstEntry.tanggal) document.getElementById('inputDate').value = firstEntry.tanggal;
             
-            if (select.value === 'Lainnya') {
+            // Populate Patients
+            rosePatients.forEach(p => {
+                addPatient();
+                const cards = document.querySelectorAll('.patient-card');
+                const card = cards[cards.length - 1];
+
+                // Fields
+                if (p.nama) card.querySelector('.p-name').value = p.nama;
+                if (p.usia) card.querySelector('.p-age').value = p.usia;
+                if (p.norm) card.querySelector('.p-rm').value = p.norm;
+                if (p.diagnosis) card.querySelector('.p-dx').value = p.diagnosis;
+                if (p.jam) card.querySelector('.p-time').value = p.jam;
+                if (p.senior) card.querySelector('.p-senior').value = p.senior;
+                if (p.asisten) card.querySelector('.p-junior').value = p.asisten;
+
+                // Activity / Jenis Tindakan Logic
+                if (p.rose_detail) {
+                    const actSelect = card.querySelector('.p-activity');
+                    const detail = p.rose_detail.toLowerCase();
+                    let matched = false;
+
+                    if (detail.includes('msct')) actSelect.value = "ROSE pendampingan MSCT Scan";
+                    else if (detail.includes('bronko')) actSelect.value = "ROSE pendampingan bronkoskopi";
+                    else if (detail.includes('bedah anak')) actSelect.value = "ROSE pendampingan biopsi bedah anak";
+                    else if (detail.includes('ginjal')) actSelect.value = "ROSE pendampingan biopsi ginjal";
+                    // ADDED IMPORT LOGIC FOR THT
+                    else if (detail.includes('tht')) actSelect.value = "ROSE pendampingan biopsi THT";
+                    else {
+                        actSelect.value = "Lainnya";
+                        // Manually toggle visible
+                        const otherInput = card.querySelector('.p-activity-other');
+                        otherInput.classList.remove('hidden');
+                        otherInput.value = p.rose_detail;
+                        matched = true;
+                    }
+                }
+
+                // Location Logic (Moved to Patient Card)
+                if (p.lokasi) {
+                    const locSelect = card.querySelector('.p-location');
+                    const locVal = p.lokasi.toLowerCase();
+                    for (let i = 0; i < locSelect.options.length; i++) {
+                        if (locSelect.options[i].value.toLowerCase() === locVal) {
+                            locSelect.selectedIndex = i;
+                            break;
+                        }
+                    }
+                }
+                
+                // Konsulen Match
+                if (p.konsulen) {
+                    const accSelect = card.querySelector('.p-acc');
+                    accSelect.value = p.konsulen;
+                    if (accSelect.selectedIndex === 0) {
+                        for (let i = 0; i < accSelect.options.length; i++) {
+                            if (accSelect.options[i].value.includes(p.konsulen) || p.konsulen.includes(accSelect.options[i].value)) {
+                                accSelect.selectedIndex = i;
+                                break;
+                            }
+                        }
+                    }
+                }
+            });
+
+            updatePatientNumbers();
+            alert(`Berhasil mengimpor ${rosePatients.length} pasien ROSE.`);
+        }
+
+        // --- CORE LOGIC ---
+        function toggleOtherActivity(selectElement) {
+            // Find the sibling input relative to the dropdown that triggered this
+            const card = selectElement.closest('.patient-card');
+            const otherInput = card.querySelector('.p-activity-other');
+            
+            if (selectElement.value === 'Lainnya') {
                 otherInput.classList.remove('hidden');
                 otherInput.focus();
             } else {
@@ -199,7 +311,6 @@
             const template = document.getElementById('patientTemplate');
             const clone = template.content.cloneNode(true);
             
-            // Generate a unique ID for this patient's radio button group
             const uniqueGroupName = 'acc_group_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
             const radios = clone.querySelectorAll('.p-acc-status');
             radios.forEach(radio => {
@@ -228,36 +339,42 @@
         }
 
         function generateOutput() {
-            // 1. Get Header Info
-            const selectVal = document.getElementById('activitySelect').value;
-            let activity = selectVal;
-            
-            if (selectVal === 'Lainnya') {
-                activity = document.getElementById('activityOther').value;
-            }
-
-            const location = document.getElementById('location').value;
-            const locationStr = location ? ` di ${location}` : '';
-
-            // Get Global Senior/Junior values
-            const seniorName = document.getElementById('globalSenior').value;
-            const juniorName = document.getElementById('globalJunior').value;
-            
             const cards = document.querySelectorAll('.patient-card');
-            const totalPatients = cards.length;
+            const groups = {}; // Object to store grouped patients
 
-            // 2. Build Header String
-            let output = `Selanjutnya, mohon izin menyampaikan rencana ${activity}${locationStr}, ada ${totalPatients} pasien:\n`;
+            // 1. Grouping Phase
+            cards.forEach((card) => {
+                // Get Activity
+                let activity = card.querySelector('.p-activity').value;
+                if (activity === 'Lainnya') {
+                    activity = card.querySelector('.p-activity-other').value;
+                }
 
-            // 3. Loop Patients
-            cards.forEach((card, index) => {
+                // Get Location
+                const location = card.querySelector('.p-location').value;
+                
+                // --- SPECIAL LOGIC: MSCT Scan ---
+                // If MSCT, we do not show location in header.
+                // We accomplish this by forcing locationStr to be empty for grouping purposes
+                let locationStr = location ? ` di ${location}` : '';
+                
+                if (activity === 'ROSE pendampingan MSCT Scan') {
+                    locationStr = ''; // Force empty location for MSCT
+                }
+
+                // Create a unique key for grouping: "Activity + LocationString"
+                // Example: "ROSE pendampingan bronkoskopi di PJT lt 4"
+                const groupKey = `Selanjutnya, mohon izin menyampaikan rencana ${activity}${locationStr}`;
+
+                // Extract Patient Details
                 const name = card.querySelector('.p-name').value;
                 const age = card.querySelector('.p-age').value;
                 const rm = card.querySelector('.p-rm').value;
                 const dx = card.querySelector('.p-dx').value;
                 const clinician = card.querySelector('.p-clinician').value;
-                
-                // Format Time
+                const senior = card.querySelector('.p-senior').value;
+                const junior = card.querySelector('.p-junior').value;
+
                 let timeVal = card.querySelector('.p-time').value;
                 if(timeVal) {
                     timeVal = timeVal.replace(':', '.') + ' WIB'; 
@@ -266,53 +383,57 @@
                 }
 
                 const accName = card.querySelector('.p-acc').value;
-
-                // Check ACC Status Radio
                 const checkedRadio = card.querySelector('input[type="radio"]:checked');
                 const statusValue = checkedRadio ? checkedRadio.value : 'acc';
-                
-                // Check "By name" Checkbox
                 const isByName = card.querySelector('.p-by-name').checked;
 
-                // Construct Acc String
-                let prefix = "";
-                if(statusValue === 'waiting') {
-                    prefix = "Menunggu acc";
-                } else {
-                    prefix = "Acc";
-                }
-
+                let prefix = (statusValue === 'waiting') ? "Menunggu acc" : "Acc";
                 let middle = isByName ? " by name" : "";
-                
-                // Final Acc Line
                 let accLine = `${prefix}${middle} ${accName}`;
 
-                // Build Patient Block
-                output += `${index + 1}.  ${name}, ${age} th, ${rm}, dengan ${dx}\n`;
-                
+                // Build Patient Block String
+                let patientBlock = `${name}, ${age} th, ${rm}, dengan ${dx}\n`;
                 if (clinician && clinician.trim() !== "") {
-                    output += `Klinisi: ${clinician}\n`;
+                    patientBlock += `Klinisi: ${clinician}\n`;
                 }
-                
-                output += `Rencana tindakan pukul ${timeVal}\n`;
-                output += `${accLine}\n`;
-                output += `Senior: ${seniorName}\n`;
-                output += `Asisten: ${juniorName}\n`; 
+                patientBlock += `Rencana tindakan pukul ${timeVal}\n`;
+                patientBlock += `${accLine}\n`;
+                patientBlock += `Senior: ${senior}\n`;
+                patientBlock += `Asisten: ${junior}`; // No newline at end of block here
+
+                // Add to Group
+                if (!groups[groupKey]) {
+                    groups[groupKey] = [];
+                }
+                groups[groupKey].push(patientBlock);
             });
 
-            // Set result
-            document.getElementById('outputResult').value = output;
+            // 2. Output Assembly Phase
+            let finalOutput = "";
+            
+            // Iterate over each group
+            for (const [header, patients] of Object.entries(groups)) {
+                finalOutput += `${header}, ada ${patients.length} pasien:\n`;
+                
+                // Iterate patients in this group
+                patients.forEach((p, index) => {
+                    finalOutput += `${index + 1}.  ${p}\n`;
+                });
+                
+                finalOutput += "\n"; // Add extra line between groups
+            }
+
+            // Remove trailing newline
+            document.getElementById('outputResult').value = finalOutput.trim();
         }
 
         function copyToClipboard() {
             const textarea = document.getElementById('outputResult');
             const btn = document.getElementById('copyButton');
             
-            // 1. Select text
             textarea.select();
-            textarea.setSelectionRange(0, 99999); // Mobile fallback
+            textarea.setSelectionRange(0, 99999); 
 
-            // 2. Try Async API first (Modern)
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(textarea.value)
                     .then(() => showSuccessState(btn))
@@ -321,7 +442,6 @@
                         fallbackCopy(textarea, btn);
                     });
             } else {
-                // 3. Fallback for older browsers or http://
                 fallbackCopy(textarea, btn);
             }
         }
@@ -329,20 +449,14 @@
         function fallbackCopy(textarea, btn) {
             try {
                 const successful = document.execCommand('copy');
-                if (successful) {
-                    showSuccessState(btn);
-                } else {
-                    alert("Gagal menyalin. Silakan salin manual.");
-                }
+                if (successful) showSuccessState(btn);
+                else alert("Gagal menyalin. Silakan salin manual.");
             } catch (err) {
                 alert("Gagal menyalin. Silakan salin manual.");
             }
         }
 
         function showSuccessState(btn) {
-            const originalContent = btn.innerHTML;
-            
-            // Switch to Success State
             btn.innerHTML = `
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -352,7 +466,6 @@
             btn.classList.remove('bg-gray-200', 'hover:bg-gray-300', 'text-gray-800');
             btn.classList.add('bg-green-600', 'hover:bg-green-700', 'text-white');
 
-            // Revert after 2 seconds
             setTimeout(() => {
                 btn.innerHTML = `
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
