@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Laporan ROSE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3f4f6; }
+        .patient-card { transition: all 0.3s ease; }
+        .patient-card:hover { border-color: #3b82f6; }
+    </style>
+</head>
+<body class="p-6">
+
+    <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
+        <h1 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">Generator Laporan ROSE</h1>
+
+        <!-- General Settings -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 bg-blue-50 p-4 rounded-md">
+            <!-- Row 1: Date & Activity -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Tindakan</label>
+                <input type="date" id="inputDate" class="w-full border-gray-300 border rounded-md p-2 focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Jenis Tindakan</label>
+                <select id="activitySelect" onchange="toggleOtherActivity()" class="w-full border-gray-300 border rounded-md p-2 bg-white">
+                    <option value="ROSE pendampingan MSCT Scan">ROSE pendampingan MSCT Scan</option>
+                    <option value="ROSE pendampingan bronkoskopi">ROSE pendampingan bronkoskopi</option>
+                    <option value="ROSE pendampingan biopsi bedah anak">ROSE pendampingan biopsi bedah anak</option>
+                    <option value="ROSE pendampingan biopsi ginjal">ROSE pendampingan biopsi ginjal</option>
+                    <option value="Lainnya">Lainnya</option>
+                </select>
+                <!-- Hidden input for 'Lainnya' -->
+                <input type="text" id="activityOther" class="hidden w-full border-gray-300 border rounded-md p-2 mt-2" placeholder="Tulis jenis tindakan...">
+            </div>
+
+            <!-- Row 2: Location -->
+            <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Lokasi</label>
+                <select id="location" class="w-full border-gray-300 border rounded-md p-2 bg-white">
+                    <option value="">-- Pilih Lokasi (Opsional) --</option>
+                    <option value="GBST">GBST</option>
+                    <option value="OK GBST 4.03">OK GBST 4.03</option>
+                    <option value="OK GBST 4.05">OK GBST 4.05</option>
+                    <option value="radiologi">radiologi</option>
+                    <option value="PJT Lt.4">PJT Lt.4</option>
+                    <option value="PICU">PICU</option>
+                    <option value="Cendrawasih">Cendrawasih</option>
+                </select>
+            </div>
+
+            <!-- Row 3: Senior & Junior (Moved Here) -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Senior</label>
+                <input type="text" id="globalSenior" class="w-full border-gray-300 border rounded-md p-2" placeholder="Inisial Senior">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Asisten (Junior)</label>
+                <input type="text" id="globalJunior" class="w-full border-gray-300 border rounded-md p-2" placeholder="Inisial Junior">
+            </div>
+        </div>
+
+        <!-- Patient List Container -->
+        <div id="patientList">
+            <!-- Patient items will be added here via JS -->
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex gap-4 mt-6 mb-8">
+            <button onclick="addPatient()" class="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md font-medium">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                Tambah Pasien
+            </button>
+            <button onclick="generateOutput()" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium">
+                Generate Text
+            </button>
+        </div>
+
+        <!-- Output Section -->
+        <div class="mt-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Hasil Output</label>
+            <textarea id="outputResult" rows="12" class="w-full bg-gray-50 border border-gray-300 rounded-md p-4 font-mono text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500" readonly></textarea>
+            
+            <!-- Button at Bottom -->
+            <button id="copyButton" onclick="copyToClipboard()" class="mt-3 w-full flex items-center justify-center gap-2 bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-3 rounded-md font-bold transition duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                </svg>
+                Copy to Clipboard
+            </button>
+        </div>
+    </div>
+
+    <!-- Template for JS to Clone (Hidden) -->
+    <template id="patientTemplate">
+        <div class="patient-card border-2 border-gray-200 rounded-lg p-4 mb-4 relative bg-white">
+            <div class="absolute top-2 right-2 cursor-pointer text-red-500 hover:text-red-700" onclick="removePatient(this)">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </div>
+            <h3 class="font-bold text-gray-400 mb-2 patient-number">Pasien #1</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+                <!-- Row 1 -->
+                <div class="md:col-span-6">
+                    <input type="text" class="p-name w-full border rounded p-1.5 text-sm" placeholder="Nama Pasien (misal: Tn. Budi)">
+                </div>
+                <div class="md:col-span-2">
+                    <input type="number" class="p-age w-full border rounded p-1.5 text-sm" placeholder="Umur (th)">
+                </div>
+                <div class="md:col-span-4">
+                    <input type="text" class="p-rm w-full border rounded p-1.5 text-sm" placeholder="No. RM (Contoh: 02277844)">
+                </div>
+
+                <!-- Row 2 -->
+                <div class="md:col-span-12">
+                    <input type="text" class="p-dx w-full border rounded p-1.5 text-sm" placeholder="Diagnosis (Contoh: NSCLC adenokarsinoma...)">
+                </div>
+
+                <!-- Row 3 -->
+                <div class="md:col-span-6">
+                    <label class="text-xs text-gray-500">Klinisi <span class="text-gray-400 italic">(Opsional)</span></label>
+                    <input type="text" class="p-clinician w-full border rounded p-1.5 text-sm" placeholder="Dr. Klinisi">
+                </div>
+                <div class="md:col-span-6">
+                    <label class="text-xs text-gray-500">Jam Tindakan</label>
+                    <input type="time" class="p-time w-full border rounded p-1.5 text-sm">
+                </div>
+
+                <!-- Row 4 -->
+                <div class="md:col-span-12">
+                    <label class="text-xs text-gray-500 font-semibold text-blue-700">Dokter Konsulen</label>
+                    <select class="p-acc w-full border rounded p-1.5 text-sm bg-white mb-2">
+                        <option value="">-- Pilih Dokter --</option>
+                        <option value="dr. Paranita Ferronika, Ph.D, Sp.PA (K)">dr. Paranita Ferronika, Ph.D, Sp.PA (K)</option>
+                        <option value="dr. Hanggoro Tri Rinonce, Ph.D, Sp.PA (K)">dr. Hanggoro Tri Rinonce, Ph.D, Sp.PA (K)</option>
+                        <option value="dr. Didik Setyo Heriyanto, Ph.D, Sp.PA (K)">dr. Didik Setyo Heriyanto, Ph.D, Sp.PA (K)</option>
+                        <option value="dr. Ery Kus Dwianingsih, Ph.D, Sp.PA (K)">dr. Ery Kus Dwianingsih, Ph.D, Sp.PA (K)</option>
+                        <option value="dr. Dewiyani Indah Widasari, Ph.D, Sp.PA (K)">dr. Dewiyani Indah Widasari, Ph.D, Sp.PA (K)</option>
+                        <option value="Dr. dr. Indrawati, Sp.PA (K)">Dr. dr. Indrawati, Sp.PA (K)</option>
+                        <option value="Prof. Dr. dr. Irianiwati, Sp.PA (K)">Prof. Dr. dr. Irianiwati, Sp.PA (K)</option>
+                        <option value="dr. Setiyani Puji Lestari, Sp.PA">dr. Setiyani Puji Lestari, Sp.PA</option>
+                        <option value="dr. Naomi Yoshuantari, Sp.PA (K)">dr. Naomi Yoshuantari, Sp.PA (K)</option>
+                        <option value="dr. Auliya Suluk Brilliant Sumpono, Sp.PA (K)">dr. Auliya Suluk Brilliant Sumpono, Sp.PA (K)</option>
+                        <option value="dr. Faizah Dwi Tirtasari, Sp.PA">dr. Faizah Dwi Tirtasari, Sp.PA</option>
+                        <option value="Dr. dr. Rita Cempaka, Sp.PA (K)">Dr. dr. Rita Cempaka, Sp.PA (K)</option>
+                    </select>
+
+                    <!-- Radio Buttons & Checkbox -->
+                    <div class="flex items-center gap-4 bg-gray-50 p-2 rounded border border-gray-200">
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="radio" value="waiting" class="p-acc-status form-radio text-yellow-600 h-4 w-4">
+                            <span class="ml-2 text-xs font-medium text-gray-700">Menunggu ACC</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="radio" value="acc" class="p-acc-status form-radio text-green-600 h-4 w-4" checked>
+                            <span class="ml-2 text-xs font-medium text-gray-700">ACC</span>
+                        </label>
+                        
+                        <!-- Separator -->
+                        <div class="h-4 w-px bg-gray-300"></div>
+
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="checkbox" class="p-by-name form-checkbox text-blue-600 h-4 w-4" checked>
+                            <span class="ml-2 text-xs font-medium text-gray-700">By name</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        // Set default date to today
+        document.getElementById('inputDate').valueAsDate = new Date();
+
+        // Initial patient
+        window.onload = function() {
+            addPatient();
+        };
+
+        // Toggle function for manual activity input
+        function toggleOtherActivity() {
+            const select = document.getElementById('activitySelect');
+            const otherInput = document.getElementById('activityOther');
+            
+            if (select.value === 'Lainnya') {
+                otherInput.classList.remove('hidden');
+                otherInput.focus();
+            } else {
+                otherInput.classList.add('hidden');
+            }
+        }
+
+        function addPatient() {
+            const container = document.getElementById('patientList');
+            const template = document.getElementById('patientTemplate');
+            const clone = template.content.cloneNode(true);
+            
+            // Generate a unique ID for this patient's radio button group
+            const uniqueGroupName = 'acc_group_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            const radios = clone.querySelectorAll('.p-acc-status');
+            radios.forEach(radio => {
+                radio.name = uniqueGroupName;
+            });
+
+            container.appendChild(clone);
+            updatePatientNumbers();
+        }
+
+        function removePatient(btn) {
+            const card = btn.closest('.patient-card');
+            if(document.querySelectorAll('.patient-card').length > 1) {
+                card.remove();
+                updatePatientNumbers();
+            } else {
+                alert("Minimal harus ada 1 pasien.");
+            }
+        }
+
+        function updatePatientNumbers() {
+            const cards = document.querySelectorAll('.patient-card');
+            cards.forEach((card, index) => {
+                card.querySelector('.patient-number').textContent = `Pasien ${index + 1}`;
+            });
+        }
+
+        function generateOutput() {
+            // 1. Get Header Info
+            const selectVal = document.getElementById('activitySelect').value;
+            let activity = selectVal;
+            
+            if (selectVal === 'Lainnya') {
+                activity = document.getElementById('activityOther').value;
+            }
+
+            const location = document.getElementById('location').value;
+            const locationStr = location ? ` di ${location}` : '';
+
+            // Get Global Senior/Junior values
+            const seniorName = document.getElementById('globalSenior').value;
+            const juniorName = document.getElementById('globalJunior').value;
+            
+            const cards = document.querySelectorAll('.patient-card');
+            const totalPatients = cards.length;
+
+            // 2. Build Header String
+            let output = `Selanjutnya, mohon izin menyampaikan rencana ${activity}${locationStr}, ada ${totalPatients} pasien:\n`;
+
+            // 3. Loop Patients
+            cards.forEach((card, index) => {
+                const name = card.querySelector('.p-name').value;
+                const age = card.querySelector('.p-age').value;
+                const rm = card.querySelector('.p-rm').value;
+                const dx = card.querySelector('.p-dx').value;
+                const clinician = card.querySelector('.p-clinician').value;
+                
+                // Format Time
+                let timeVal = card.querySelector('.p-time').value;
+                if(timeVal) {
+                    timeVal = timeVal.replace(':', '.') + ' WIB'; 
+                } else {
+                    timeVal = 'Belum ditentukan';
+                }
+
+                const accName = card.querySelector('.p-acc').value;
+
+                // Check ACC Status Radio
+                const checkedRadio = card.querySelector('input[type="radio"]:checked');
+                const statusValue = checkedRadio ? checkedRadio.value : 'acc';
+                
+                // Check "By name" Checkbox
+                const isByName = card.querySelector('.p-by-name').checked;
+
+                // Construct Acc String
+                let prefix = "";
+                if(statusValue === 'waiting') {
+                    prefix = "Menunggu acc";
+                } else {
+                    prefix = "Acc";
+                }
+
+                let middle = isByName ? " by name" : "";
+                
+                // Final Acc Line
+                let accLine = `${prefix}${middle} ${accName}`;
+
+                // Build Patient Block
+                output += `${index + 1}.  ${name}, ${age} th, ${rm}, dengan ${dx}\n`;
+                
+                if (clinician && clinician.trim() !== "") {
+                    output += `Klinisi: ${clinician}\n`;
+                }
+                
+                output += `Rencana tindakan pukul ${timeVal}\n`;
+                output += `${accLine}\n`;
+                output += `Senior: ${seniorName}\n`;
+                output += `Asisten: ${juniorName}\n`; 
+            });
+
+            // Set result
+            document.getElementById('outputResult').value = output;
+        }
+
+        function copyToClipboard() {
+            const textarea = document.getElementById('outputResult');
+            const btn = document.getElementById('copyButton');
+            
+            // 1. Select text
+            textarea.select();
+            textarea.setSelectionRange(0, 99999); // Mobile fallback
+
+            // 2. Try Async API first (Modern)
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(textarea.value)
+                    .then(() => showSuccessState(btn))
+                    .catch(err => {
+                        console.error('Async Copy Failed', err);
+                        fallbackCopy(textarea, btn);
+                    });
+            } else {
+                // 3. Fallback for older browsers or http://
+                fallbackCopy(textarea, btn);
+            }
+        }
+
+        function fallbackCopy(textarea, btn) {
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showSuccessState(btn);
+                } else {
+                    alert("Gagal menyalin. Silakan salin manual.");
+                }
+            } catch (err) {
+                alert("Gagal menyalin. Silakan salin manual.");
+            }
+        }
+
+        function showSuccessState(btn) {
+            const originalContent = btn.innerHTML;
+            
+            // Switch to Success State
+            btn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                Copied to clipboard!
+            `;
+            btn.classList.remove('bg-gray-200', 'hover:bg-gray-300', 'text-gray-800');
+            btn.classList.add('bg-green-600', 'hover:bg-green-700', 'text-white');
+
+            // Revert after 2 seconds
+            setTimeout(() => {
+                btn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                </svg>
+                Copy to Clipboard`;
+                btn.classList.remove('bg-green-600', 'hover:bg-green-700', 'text-white');
+                btn.classList.add('bg-gray-200', 'hover:bg-gray-300', 'text-gray-800');
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
