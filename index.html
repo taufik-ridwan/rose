@@ -94,7 +94,6 @@
                         <option value="ROSE pendampingan bronkoskopi">ROSE pendampingan bronkoskopi</option>
                         <option value="ROSE pendampingan biopsi bedah anak">ROSE pendampingan biopsi bedah anak</option>
                         <option value="ROSE pendampingan biopsi ginjal">ROSE pendampingan biopsi ginjal</option>
-                        <!-- ADDED: Biopsi THT -->
                         <option value="ROSE pendampingan biopsi THT">ROSE pendampingan biopsi THT</option>
                         <option value="Lainnya">Lainnya</option>
                     </select>
@@ -114,12 +113,10 @@
                         <option value="GBST">GBST</option>
                         <option value="OK GBST 4.03">OK GBST 4.03</option>
                         <option value="OK GBST 4.05">OK GBST 4.05</option>
-                        <!-- UPDATED: Display: Radiologi, Value: radiologi -->
                         <option value="radiologi">Radiologi</option>
                         <option value="PJT Lt.4">PJT Lt.4</option>
                         <option value="PICU">PICU</option>
                         <option value="Cendrawasih">Cendrawasih</option>
-                        <!-- ADDED: Poli THT -->
                         <option value="Poli THT">Poli THT</option>
                     </select>
                 </div>
@@ -210,7 +207,6 @@
         }
 
         function processImportData(data) {
-            // Filter only 'ROSE'
             const rosePatients = data.filter(item => item.tindakan && item.tindakan.toUpperCase() === 'ROSE');
 
             if (rosePatients.length === 0) {
@@ -220,17 +216,14 @@
 
             document.getElementById('patientList').innerHTML = '';
 
-            // Set Date from first entry
             const firstEntry = rosePatients[0];
             if (firstEntry.tanggal) document.getElementById('inputDate').value = firstEntry.tanggal;
             
-            // Populate Patients
             rosePatients.forEach(p => {
                 addPatient();
                 const cards = document.querySelectorAll('.patient-card');
                 const card = cards[cards.length - 1];
 
-                // Fields
                 if (p.nama) card.querySelector('.p-name').value = p.nama;
                 if (p.usia) card.querySelector('.p-age').value = p.usia;
                 if (p.norm) card.querySelector('.p-rm').value = p.norm;
@@ -239,7 +232,6 @@
                 if (p.senior) card.querySelector('.p-senior').value = p.senior;
                 if (p.asisten) card.querySelector('.p-junior').value = p.asisten;
 
-                // Activity / Jenis Tindakan Logic
                 if (p.rose_detail) {
                     const actSelect = card.querySelector('.p-activity');
                     const detail = p.rose_detail.toLowerCase();
@@ -249,11 +241,9 @@
                     else if (detail.includes('bronko')) actSelect.value = "ROSE pendampingan bronkoskopi";
                     else if (detail.includes('bedah anak')) actSelect.value = "ROSE pendampingan biopsi bedah anak";
                     else if (detail.includes('ginjal')) actSelect.value = "ROSE pendampingan biopsi ginjal";
-                    // ADDED IMPORT LOGIC FOR THT
                     else if (detail.includes('tht')) actSelect.value = "ROSE pendampingan biopsi THT";
                     else {
                         actSelect.value = "Lainnya";
-                        // Manually toggle visible
                         const otherInput = card.querySelector('.p-activity-other');
                         otherInput.classList.remove('hidden');
                         otherInput.value = p.rose_detail;
@@ -261,7 +251,6 @@
                     }
                 }
 
-                // Location Logic (Moved to Patient Card)
                 if (p.lokasi) {
                     const locSelect = card.querySelector('.p-location');
                     const locVal = p.lokasi.toLowerCase();
@@ -273,7 +262,6 @@
                     }
                 }
                 
-                // Konsulen Match
                 if (p.konsulen) {
                     const accSelect = card.querySelector('.p-acc');
                     accSelect.value = p.konsulen;
@@ -294,7 +282,6 @@
 
         // --- CORE LOGIC ---
         function toggleOtherActivity(selectElement) {
-            // Find the sibling input relative to the dropdown that triggered this
             const card = selectElement.closest('.patient-card');
             const otherInput = card.querySelector('.p-activity-other');
             
@@ -353,17 +340,12 @@
                 // Get Location
                 const location = card.querySelector('.p-location').value;
                 
-                // --- SPECIAL LOGIC: MSCT Scan ---
-                // If MSCT, we do not show location in header.
-                // We accomplish this by forcing locationStr to be empty for grouping purposes
+                // Special Logic: MSCT Scan
                 let locationStr = location ? ` di ${location}` : '';
-                
                 if (activity === 'ROSE pendampingan MSCT Scan') {
-                    locationStr = ''; // Force empty location for MSCT
+                    locationStr = ''; 
                 }
 
-                // Create a unique key for grouping: "Activity + LocationString"
-                // Example: "ROSE pendampingan bronkoskopi di PJT lt 4"
                 const groupKey = `Selanjutnya, mohon izin menyampaikan rencana ${activity}${locationStr}`;
 
                 // Extract Patient Details
@@ -375,9 +357,12 @@
                 const senior = card.querySelector('.p-senior').value;
                 const junior = card.querySelector('.p-junior').value;
 
-                let timeVal = card.querySelector('.p-time').value;
-                if(timeVal) {
-                    timeVal = timeVal.replace(':', '.') + ' WIB'; 
+                // Time handling
+                const rawTime = card.querySelector('.p-time').value; // Get raw value for sorting (HH:MM)
+                let timeVal;
+                
+                if(rawTime) {
+                    timeVal = rawTime.replace(':', '.') + ' WIB'; 
                 } else {
                     timeVal = 'Belum ditentukan';
                 }
@@ -399,31 +384,36 @@
                 patientBlock += `Rencana tindakan pukul ${timeVal}\n`;
                 patientBlock += `${accLine}\n`;
                 patientBlock += `Senior: ${senior}\n`;
-                patientBlock += `Asisten: ${junior}`; // No newline at end of block here
+                patientBlock += `Asisten: ${junior}`;
 
-                // Add to Group
+                // Add to Group with Sortable Time Key
                 if (!groups[groupKey]) {
                     groups[groupKey] = [];
                 }
-                groups[groupKey].push(patientBlock);
+                
+                // Use '99:99' fallback to ensure empty times appear at the end
+                groups[groupKey].push({
+                    sortTime: rawTime || '99:99', 
+                    text: patientBlock
+                });
             });
 
-            // 2. Output Assembly Phase
+            // 2. Output Assembly Phase (with Sorting)
             let finalOutput = "";
             
-            // Iterate over each group
             for (const [header, patients] of Object.entries(groups)) {
+                // Sort by time
+                patients.sort((a, b) => a.sortTime.localeCompare(b.sortTime));
+
                 finalOutput += `${header}, ada ${patients.length} pasien:\n`;
                 
-                // Iterate patients in this group
                 patients.forEach((p, index) => {
-                    finalOutput += `${index + 1}.  ${p}\n`;
+                    finalOutput += `${index + 1}.  ${p.text}\n`;
                 });
                 
-                finalOutput += "\n"; // Add extra line between groups
+                finalOutput += "\n";
             }
 
-            // Remove trailing newline
             document.getElementById('outputResult').value = finalOutput.trim();
         }
 
